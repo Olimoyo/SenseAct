@@ -2,7 +2,7 @@ from math import sin, cos, fabs, asin, acos, sqrt, atan2
 from math import pi as PI
 import numpy as np
 
-FIRMWARE_VERSION = 3.4 # put firmware version here
+FIRMWARE_VERSION = 3.3 # put firmware version here
 DASHBOARD_SERVER_PORT = 29999  # to unlock protective stop
 PRIMARY_CLIENT_INTERFACE_PORT = 30001
 SECONDARY_CLIENT_INTERFACE_PORT = 30002
@@ -44,7 +44,7 @@ COMMANDS = {
             'default':
                 {
                     'a': 1.4,
-                    't_min': 0.008,
+                    't_min': 0.008, # for firmware < 3.1, 0.02 might work better
                 }
         },
     'MOVEL':
@@ -354,9 +354,12 @@ class SpeedJ(object):
         self.t_min = t_min
 
     def __repr__(self):
-        return 'speedj([{}, {}, {}, {}, {}, {}], {}, {})'.format(
-            *(list(self.qd) + [self.a, self.t_min]))
-
+        if FIRMWARE_VERSION >= 3.1 and FIRMWARE_VERSION < 3.3:
+            return 'speedj([{}, {}, {}, {}, {}, {}], {})'.format(
+                *(list(self.qd) + [self.a]))
+        else:
+            return 'speedj([{}, {}, {}, {}, {}, {}], {}, {})'.format(
+                *(list(self.qd) + [self.a, self.t_min]))
 
 class MoveJ(object):
     """Represents MoveJ UR5 command.
